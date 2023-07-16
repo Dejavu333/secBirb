@@ -7,8 +7,11 @@ from email.mime.image import MIMEImage
 import win32gui
 import win32con
 
+##################################################################
+# Setup
+##################################################################
 # Email configuration
-smtp_server = ''
+smtp_server = 'smtp.gmail.com'
 smtp_port = 587
 email_sender = ''
 email_receiver = ''
@@ -19,7 +22,8 @@ email_password = ''  # generated app password for Gmail
 image_folder = 'secimages'
 
 # Set the interval in seconds
-capture_interval = 2000
+HOUR = 3600
+capture_interval = 2*HOUR
 
 # Set the maximum number of capture attempts
 max_capture_attempts = 3
@@ -45,9 +49,11 @@ def capture_image():
     camera.release()
     raise Exception('Failed to capture image')
 
+
 def delete_image(image_path):
     print('Deleting image...')
     os.remove(image_path)
+
 
 def send_email(image_path):
     print('Sending email...')
@@ -68,34 +74,27 @@ def send_email(image_path):
 
 def turn_on_screen():
     # Turn on the screenC
-    win32gui.SendMessage(win32con.HWND_BROADCAST, win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, 1)
+    win32gui.SendMessage(win32con.HWND_BROADCAST, win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, -1)
 
 def turn_off_screen():
     # Turn off the screen
     win32gui.SendMessage(win32con.HWND_BROADCAST, win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, 2)
-
 
 ##################################################################
 # Main
 ##################################################################
 while True:
     try:
-        turn_on_screen() # hack around (
-        image_path = capture_image()
         turn_on_screen()
-
-
-        time.sleep(2)
+        image_path = capture_image()
+        turn_on_screen(); time.sleep(1); turn_on_screen() # hack around 
         send_email(image_path)
-
-
-        time.sleep(2)
+        turn_on_screen(); time.sleep(1); turn_on_screen() # hack around
         delete_image(image_path)
-
-
     except Exception as e:
         print(f'An error occurred: {e}')
     finally:
         print(f'Waiting {capture_interval} seconds...')
+        time.sleep(5) # hack around
         turn_off_screen()
         time.sleep(capture_interval)
