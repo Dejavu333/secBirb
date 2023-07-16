@@ -23,7 +23,7 @@ image_folder = 'secimages'
 
 # Set the interval in seconds
 HOUR = 3600
-capture_interval = 2*HOUR
+capture_interval = 1*HOUR
 
 # Set the maximum number of capture attempts
 max_capture_attempts = 3
@@ -49,11 +49,9 @@ def capture_image():
     camera.release()
     raise Exception('Failed to capture image')
 
-
 def delete_image(image_path):
     print('Deleting image...')
     os.remove(image_path)
-
 
 def send_email(image_path):
     print('Sending email...')
